@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 9254417}
   - component: {fileID: 9254416}
   - component: {fileID: 9254415}
-  - component: {fileID: 9254414}
+  - component: {fileID: 9254420}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -140,22 +140,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &9254414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9254413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680b2048ed0b04c43b5d4611d40b0f7c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  walkSpeed: 5
-  lookSensitivity: 0.1
-  interactionDistance: 2.5
-  gravityMultiplier: 2
 --- !u!143 &9254415
 CharacterController:
   m_ObjectHideFlags: 0
@@ -277,6 +261,44 @@ Transform:
   - {fileID: 1578945099}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9254420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9254413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 680b2048ed0b04c43b5d4611d40b0f7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AdvancedPlayerController
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u0411\u0435\u0433\u0430": 5
+  "\u0431\u0430\u0437\u043E\u0432\u044B\u0439FOV": 60
+  "\u0431\u0435\u0433FOV": 75
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u0418\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u044FFOV": 5
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u0425\u043E\u0434\u044C\u0431\u044B": 3
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u0412\u041F\u0440\u0438\u0441\u0435\u0434\u0435": 2.43
+  "\u0441\u0438\u043B\u0430\u041F\u0440\u044B\u0436\u043A\u0430": 6
+  "\u0433\u0440\u0430\u0432\u0438\u0442\u0430\u0446\u0438\u044F": 20
+  "\u043F\u043B\u0430\u0432\u043D\u043E\u0441\u0442\u044C\u0414\u0432\u0438\u0436\u0435\u043D\u0438\u044F": 15
+  "\u0432\u044B\u0441\u043E\u0442\u0430\u041A\u0430\u043C\u0435\u0440\u044B\u0421\u0442\u043E\u044F": 0.8
+  "\u0432\u044B\u0441\u043E\u0442\u0430\u041A\u0430\u043C\u0435\u0440\u044B\u041F\u0440\u0438\u0441\u0435\u0434": 0
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u041F\u0440\u0438\u0441\u0435\u0434\u0430\u043D\u0438\u044F": 10
+  "\u0441\u0441\u044B\u043B\u043A\u0430\u041D\u0430\u041A\u0430\u043C\u0435\u0440\u0443": {fileID: 1578945099}
+  "\u0447\u0443\u0432\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C\u041C\u044B\u0448\u0438": 1
+  "\u043B\u0438\u043C\u0438\u0442\u0412\u0437\u0433\u043B\u044F\u0434\u0430\u0412\u0432\u0435\u0440\u0445": 80
+  "\u043B\u0438\u043C\u0438\u0442\u0412\u0437\u0433\u043B\u044F\u0434\u0430\u0412\u043D\u0438\u0437": 80
+  "\u0443\u0433\u043E\u043B\u041D\u0430\u043A\u043B\u043E\u043D\u0430\u041E\u0442\u041C\u044B\u0448\u0438": 5
+  "\u043F\u043B\u0430\u0432\u043D\u043E\u0441\u0442\u044C\u0412\u043E\u0437\u0432\u0440\u0430\u0442\u0430\u041D\u0430\u043A\u043B\u043E\u043D\u0430": 5
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u0414\u044B\u0445\u0430\u043D\u0438\u044F": 2
+  "\u0430\u043C\u043F\u043B\u0438\u0442\u0443\u0434\u0430\u0414\u044B\u0445\u0430\u043D\u0438\u044F": 0.04
+  "\u0447\u0430\u0441\u0442\u043E\u0442\u0430\u0428\u0430\u0433\u043E\u0432": 14
+  "\u0430\u043C\u043F\u043B\u0438\u0442\u0443\u0434\u0430\u0428\u0430\u0433\u043E\u0432": 0.08
+  "\u0443\u0433\u043E\u043B\u041D\u0430\u043A\u043B\u043E\u043D\u0430\u0421\u0442\u0440\u0435\u0439\u0444\u0430": 2
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u041D\u0430\u043A\u043B\u043E\u043D\u0430": 5
+  "\u0441\u0438\u043B\u0430\u0422\u043E\u043B\u0447\u043A\u0430\u041D\u0430\u0421\u0442\u0443\u043F\u0435\u043D\u044C\u043A\u0430\u0445": 0.3
+  "\u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C\u0412\u043E\u0437\u0432\u0440\u0430\u0442\u0430\u0421\u0442\u0443\u043F\u0435\u043D\u0435\u043A": 8
 --- !u!1 &17346075 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9141816029861474070, guid: dd795e28a03e04449b6feb5b52682fda, type: 3}
@@ -964,6 +986,85 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1972043669}
   m_SourcePrefab: {fileID: 100100000, guid: a2d11065acbc4ab44a79b03e528bd799, type: 3}
+--- !u!1 &1190391024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1190391027}
+  - component: {fileID: 1190391026}
+  - component: {fileID: 1190391025}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1190391025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190391024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.InputSystemUIInputModule
+  m_SendPointerHoverToParent: 1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
+--- !u!114 &1190391026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190391024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventSystem
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &1190391027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190391024}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1254512239 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2040254050740271484, guid: dd795e28a03e04449b6feb5b52682fda, type: 3}
@@ -2101,3 +2202,4 @@ SceneRoots:
   - {fileID: 1122838059}
   - {fileID: 1829949068}
   - {fileID: 49026089}
+  - {fileID: 1190391027}

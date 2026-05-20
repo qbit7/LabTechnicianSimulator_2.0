@@ -1,158 +1,307 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Передвижение")]
-    public float walkSpeed = 5f;
+    [Header("Настройки бега")]
+    [Tooltip("Скорость бега при зажатом Shift")]
+    public float скоростьБега = 8.0f;
+    [Tooltip("Обычный угол обзора камеры (когда стоим/идем)")]
+    public float базовыйFOV = 60.0f;
+    [Tooltip("Угол обзора камеры при беге (эффект скорости)")]
+    public float бегFOV = 70.0f;
+    [Tooltip("Скорость изменения угла обзора")]
+    public float скоростьИзмененияFOV = 5.0f;
 
-    [Header("Вращение камеры")]
-    public float lookSensitivity = 0.1f;
+    // Внутренние переменные (добавь к остальным приватным)
+    private Camera компонентКамеры;
+    private bool хочетБежать = false;
 
-    [Header("Взаимодействие")]
-    public float interactionDistance = 2.5f;
+    [Header("Настройки движения")]
+    [Tooltip("Скорость обычного шага")]
+    public float скоростьХодьбы = 5.0f;
+    [Tooltip("Скорость при движении гусиным шагом (в приседе)")]
+    public float скоростьВПриседе = 2.5f;
+    [Tooltip("Сила прыжка")]
+    public float силаПрыжка = 6.0f;
+    [Tooltip("Сила гравитации для игрока")]
+    public float гравитация = 20.0f;
+    [Tooltip("Плавность разгона и торможения. Чем выше значение, тем резче персонаж слушается управления.")]
+    public float плавностьДвижения = 10.0f;
 
-    [Header("Гравитация")]
-    public float gravityMultiplier = 2f;        // множитель силы падения
+    [Header("Настройки приседания")]
+    [Tooltip("Высота камеры, когда игрок стоит (смещение от центра объекта)")]
+    public float высотаКамерыСтоя = 0.8f;
+    [Tooltip("Высота камеры, когда игрок присел")]
+    public float высотаКамерыПрисед = 0.0f;
+    [Tooltip("Скорость приседания и подъема")]
+    public float скоростьПриседания = 8.0f;
 
-    private float _verticalVelocity;            // текущая скорость падения
+    [Header("Настройки обзора (Мышь)")]
+    public Transform ссылкаНаКамеру;
+    [Tooltip("Рекомендуемое значение: от 1 до 5")]
+    public float чувствительностьМыши = 2.0f;
+    public float лимитВзглядаВверх = 80.0f;
+    public float лимитВзглядаВниз = 80.0f;
 
-    private CharacterController _controller;
-    private Camera _playerCamera;
-    private PlayerControls _input;
+    [Header("Динамический наклон (Поворот мышью)")]
+    [Tooltip("Угол наклона камеры по Z при резком повороте мышью. Рекомендуется: 1-3")]
+    public float уголНаклонаОтМыши = 2.0f;
+    [Tooltip("Скорость, с которой камера возвращается в ровное положение")]
+    public float плавностьВозвратаНаклона = 5.0f;
 
-    private Vector2 _moveInput;
-    private Vector2 _lookInput;
-    private float _cameraPitch = 0f;
+    [Header("Эффект дыхания (Покой)")]
+    [Tooltip("Скорость колебания камеры при дыхании")]
+    public float скоростьДыхания = 2.0f;
+    [Tooltip("Амплитуда (интенсивность) дыхания")]
+    public float амплитудаДыхания = 0.02f;
 
-    void Awake()
+    [Header("Эффект шагов (Движение вверх/вниз)")]
+    [Tooltip("Скорость покачивания при ходьбе")]
+    public float частотаШагов = 14.0f;
+    [Tooltip("Высота покачивания при ходьбе")]
+    public float амплитудаШагов = 0.08f;
+
+    [Header("Наклоны (Движение влево/вправо)")]
+    [Tooltip("Угол наклона камеры при стрейфе (ходьбе боком)")]
+    public float уголНаклонаСтрейфа = 2.0f;
+    [Tooltip("Скорость возврата/наклона камеры")]
+    public float скоростьНаклона = 5.0f;
+
+    [Header("Эффект ступенек")]
+    [Tooltip("Сила тряски/толчка камеры при подъеме по лестницам. Рекомендуется: 0.1 - 0.3")]
+    public float силаТолчкаНаСтупеньках = 0.15f;
+    [Tooltip("Скорость возврата камеры после толчка на ступеньке")]
+    public float скоростьВозвратаСтупенек = 8.0f;
+
+    // Внутренние переменные
+    private CharacterController контроллер;
+    private Vector3 направлениеДвижения = Vector3.zero;
+    private float вращениеХ = 0;
+
+    private float текущаяБазоваяВысотаКамерыY;
+    private float таймерКолебаний = 0;
+    private float текущийНаклонZ = 0;
+    private bool хочетПрисесть = false;
+
+    // Переменные для ввода
+    private Vector2 вводДвижения;
+    private Vector2 вводМыши;
+    private bool нажатПрыжок;
+
+    // Сглаживание наклона от мыши и расчет ступенек
+    private float наклонОтМышиLerp;
+    private float былаВысотаИгрока;
+    private float смещениеОтСтупенекY = 0;
+
+    void Start()
     {
-        _controller = GetComponent<CharacterController>();
-        _playerCamera = GetComponentInChildren<Camera>();
-        _input = new PlayerControls();
+        контроллер = GetComponent<CharacterController>();
 
-        // Прячем и блокируем курсор
+        if (ссылкаНаКамеру != null)
+        {
+            // Автоматически получаем компонент Camera для изменения FOV
+            компонентКамеры = ссылкаНаКамеру.GetComponent<Camera>();
+            if (компонентКамеры != null)
+            {
+                компонентКамеры.fieldOfView = базовыйFOV;
+            }
+        }
+
+        текущаяБазоваяВысотаКамерыY = высотаКамерыСтоя;
+        былаВысотаИгрока = transform.position.y;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    void OnEnable()
-    {
-        _input.Player.Enable();
-        _input.Player.Move.performed += OnMove;
-        _input.Player.Move.canceled += OnMove;
-        _input.Player.Look.performed += OnLook;
-        _input.Player.Look.canceled += OnLook;
-        _input.Player.Interact.performed += OnInteract;
-        _input.Player.Quit.performed += OnQuit;
-    }
-
-    void OnDisable()
-    {
-        _input.Player.Move.performed -= OnMove;
-        _input.Player.Move.canceled -= OnMove;
-        _input.Player.Look.performed -= OnLook;
-        _input.Player.Look.canceled -= OnLook;
-        _input.Player.Interact.performed -= OnInteract;
-        _input.Player.Quit.performed -= OnQuit;
-        _input.Player.Disable();
-    }
-
     void Update()
     {
-        HandleMovement();
-        HandleMouseLook();
-        ApplyGravity();
+        былаВысотаИгрока = transform.position.y;
+
+        СборВвода();
+        УправлениеВращением();
+        УправлениеПриседанием();
+        УправлениеПеремещением();
+
+        РасчетСтупенек();
+        ЭффектыКамеры();
     }
 
-    // ── Обработчики ввода ──
-
-    private void OnMove(InputAction.CallbackContext ctx)
+    void СборВвода()
     {
-        _moveInput = ctx.ReadValue<Vector2>();
+        var клавиатура = Keyboard.current;
+        var мышь = Mouse.current;
+
+        if (клавиатура == null || мышь == null) return;
+
+        float х = 0;
+        float y = 0;
+        if (клавиатура.wKey.isPressed) y = 1;
+        if (клавиатура.sKey.isPressed) y = -1;
+        if (клавиатура.dKey.isPressed) х = 1;
+        if (клавиатура.aKey.isPressed) х = -1;
+        вводДвижения = new Vector2(х, y).normalized;
+
+        вводМыши = мышь.delta.ReadValue();
+
+        нажатПрыжок = клавиатура.spaceKey.wasPressedThisFrame;
+        хочетПрисесть = клавиатура.leftCtrlKey.isPressed;
+
+        // Персонаж хочет бежать, только если зажат Shift и он идет ВПЕРЕД (вводДвижения.y > 0)
+        // Бегать спиной или боком обычно в играх запрещают, чтобы не ломать динамику
+        хочетБежать = клавиатура.leftShiftKey.isPressed && вводДвижения.y > 0.1f && !хочетПрисесть;
     }
 
-    private void OnLook(InputAction.CallbackContext ctx)
+    void УправлениеВращением()
     {
-        _lookInput = ctx.ReadValue<Vector2>();
+        if (ссылкаНаКамеру == null) return;
+
+        float мышьХ = вводМыши.x * (чувствительностьМыши * 0.1f);
+        float мышьY = вводМыши.y * (чувствительностьМыши * 0.1f);
+
+        transform.Rotate(Vector3.up * мышьХ);
+
+        вращениеХ -= мышьY;
+        вращениеХ = Mathf.Clamp(вращениеХ, -лимитВзглядаВниз, лимитВзглядаВверх);
     }
 
-    private void OnInteract(InputAction.CallbackContext ctx)
+    void УправлениеПриседанием()
     {
-        if (ctx.performed) TryInteract();
+        // Выбираем целевую высоту ИМЕННО ДЛЯ КАМЕРЫ
+        float целеваяВысотаКамеры = хочетПрисесть ? высотаКамерыПрисед : высотаКамерыСтоя;
+
+        // Плавно двигаем базовую точку камеры вверх-вниз без изменения физики капсулы
+        текущаяБазоваяВысотаКамерыY = Mathf.Lerp(текущаяБазоваяВысотаКамерыY, целеваяВысотаКамеры, Time.deltaTime * скоростьПриседания);
     }
 
-    private void OnQuit(InputAction.CallbackContext ctx)
+    void УправлениеПеремещением()
     {
-        if (ctx.performed)
+        // Рассчитываем гравитацию независимо, она должна работать всегда
+        float сохраненнаяСкоростьY = направлениеДвижения.y;
+
+        if (контроллер.isGrounded)
         {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            Vector3 вперед = transform.TransformDirection(Vector3.forward);
+            Vector3 вправо = transform.TransformDirection(Vector3.right);
+
+            // 1. Выбираем целевую скорость
+            float целеваяСкорость = скоростьХодьбы;
+            if (хочетПрисесть) целеваяСкорость = скоростьВПриседе;
+            else if (хочетБежать) целеваяСкорость = скоростьБега;
+
+            // 2. Считаем ВЕКТОР НАПРАВЛЕНИЯ, куда игрок ХОЧЕТ двигаться в идеале
+            Vector3 желаемоеНаправление = (вперед * вводДвижения.y + вправо * вводДвижения.x) * целеваяСкорость;
+
+            // Очищаем Y у желаемого направления, чтобы оно не ломало прыжки и гравитацию
+            направлениеДвижения.y = 0;
+
+            // 3. ПЛАВНОСТЬ: Текущее движение плавно стремится к желаемому
+            направлениеДвижения = Vector3.MoveTowards(направлениеДвижения, желаемоеНаправление, Time.deltaTime * плавностьДвижения);
+
+            // 4. Логика прыжка
+            if (нажатПрыжок)
+            {
+                сохраненнаяСкоростьY = силаПрыжка;
+            }
+            else
+            {
+                // Если мы на земле и не прыгаем, слегка прижимаем игрока к полу (стандартный трюк для CharacterController)
+                сохраненнаяСкоростьY = -2.0f;
+            }
         }
+
+        // Возвращаем и применяем гравитацию
+        направлениеДвижения.y = сохраненнаяСкоростьY;
+        направлениеДвижения.y -= гравитация * Time.deltaTime;
+
+        // Финальное перемещение
+        контроллер.Move(направлениеДвижения * Time.deltaTime);
     }
 
-    // ── Движение ──
-
-    void HandleMovement()
+    void РасчетСтупенек()
     {
-        Vector3 forward = _playerCamera.transform.forward;
-        Vector3 right = _playerCamera.transform.right;
-        forward.y = 0f;
-        right.y = 0f;
-        forward.Normalize();
-        right.Normalize();
+        float текущаяДельтаВысоты = transform.position.y - былаВысотаИгрока;
 
-        Vector3 moveDir = (forward * _moveInput.y + right * _moveInput.x).normalized;
-
-        // Двигаем только по горизонтали (вертикаль теперь в ApplyGravity)
-        Vector3 horizontalMove = moveDir * (walkSpeed * Time.deltaTime);
-        _controller.Move(horizontalMove);
-    }
-
-    // ── Взгляд ──
-
-    void HandleMouseLook()
-    {
-        float yaw = _lookInput.x * lookSensitivity;
-        transform.Rotate(Vector3.up * yaw);
-
-        _cameraPitch -= _lookInput.y * lookSensitivity;
-        _cameraPitch = Mathf.Clamp(_cameraPitch, -90f, 90f);
-        _playerCamera.transform.localRotation = Quaternion.Euler(_cameraPitch, 0f, 0f);
-    }
-
-    // ── Взаимодействие ──
-
-    void TryInteract()
-    {
-        Ray ray = new Ray(_playerCamera.transform.position, _playerCamera.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
+        if (контроллер.isGrounded && направлениеДвижения.y <= 0 && текущаяДельтаВысоты > 0.01f)
         {
-            //Interactable interactable = hit.collider.GetComponentInParent<Interactable>();
-            //interactable?.Interact();
-            Debug.Log("Взаимодействие с " + hit.collider.name + " (скрипт Interactable отсутствует)");
+            смещениеОтСтупенекY -= текущаяДельтаВысоты * силаТолчкаНаСтупеньках;
+            смещениеОтСтупенекY = Mathf.Clamp(смещениеОтСтупенекY, -0.2f, 0f);
         }
+
+        смещениеОтСтупенекY = Mathf.Lerp(смещениеОтСтупенекY, 0, Time.deltaTime * скоростьВозвратаСтупенек);
     }
 
-    // ── Гравитация ──
-
-    void ApplyGravity()
+    void ЭффектыКамеры()
     {
-        // Если персонаж на земле и падает (вертикальная скорость отрицательная),
-        // сбрасываем скорость до маленького значения, чтобы прижимать к поверхности
-        if (_controller.isGrounded && _verticalVelocity < 0f)
+        if (ссылкаНаКамеру == null) return;
+
+        bool двигается = (вводДвижения.magnitude > 0.1f) && контроллер.isGrounded;
+        Vector3 целеваяПозицияКамеры = ссылкаНаКамеру.localPosition;
+
+        if (двигается)
         {
-            _verticalVelocity = -2f; // небольшой прижим
+            // Корректируем скорость и амплитуду шагов в зависимости от состояния
+            float множительСкоростиКачания = 1.0f;
+            float множительАмплитуды = 1.0f;
+
+            if (хочетПрисесть)
+            {
+                множительСкоростиКачания = 0.7f;
+            }
+            else if (хочетБежать)
+            {
+                множительСкоростиКачания = 1.4f; // При беге ноги двигаются быстрее
+                множительАмплитуды = 1.3f;       // И камеру трясет сильнее
+            }
+
+            таймерКолебаний += Time.deltaTime * (частотаШагов * множительСкоростиКачания);
+
+            целеваяПозицияКамеры.y = текущаяБазоваяВысотаКамерыY + Mathf.Sin(таймерКолебаний) * (амплитудаШагов * множительАмплитуды);
+            целеваяПозицияКамеры.x = Mathf.Cos(таймерКолебаний / 2) * (амплитудаШагов * 0.5f * множительАмплитуды);
         }
         else
         {
-            // Добавляем ускорение свободного падения
-            _verticalVelocity += Physics.gravity.y * gravityMultiplier * Time.deltaTime;
+            // --- ЭФФЕКТ ДЫХАНИЯ (В ПОКОЕ) ---
+            таймерКолебаний += Time.deltaTime * скоростьДыхания;
+
+            целеваяПозицияКамеры.y = текущаяБазоваяВысотаКамерыY + Mathf.Sin(таймерКолебаний) * амплитудаДыхания;
+            целеваяПозицияКамеры.x = Mathf.Lerp(целеваяПозицияКамеры.x, 0, Time.deltaTime * скоростьНаклона);
         }
 
-        // Двигаем персонажа только по вертикали
-        _controller.Move(Vector3.up * _verticalVelocity * Time.deltaTime);
+        // Применяем смещение от ступенек и позицию
+        целеваяПозицияКамеры.y += смещениеОтСтупенекY;
+        ссылкаНаКамеру.localPosition = целеваяПозицияКамеры;
+
+        // --- ДИНАМИЧЕСКИЙ FOV (ЭФФЕКТ СКОРОСТИ) ---
+        if (компонентКамеры != null)
+        {
+            float целевойFOV = хочетБежать && двигается ? бегFOV : базовыйFOV;
+            компонентКамеры.fieldOfView = Mathf.Lerp(компонентКамеры.fieldOfView, целевойFOV, Time.deltaTime * скоростьИзмененияFOV);
+        }
+
+        // --- РАСЧЕТ НАКЛОНОВ (По оси Z) ---
+        float финальныйЦелевойНаклон = 0;
+
+        // 1. Наклон от стрейфа
+        float наклонСтрейфа = 0;
+        if (двигается && Mathf.Abs(вводДвижения.x) > 0.1f)
+        {
+            // При беге наклоны от стрейфа можно сделать чуть сильнее (опционально)
+            float множительНаклона = хочетБежать ? 1.5f : 1.0f;
+            наклонСтрейфа = -вводДвижения.x * (уголНаклонаСтрейфа * множительНаклона);
+        }
+
+        // 2. Наклон от мыши
+        float дельтаМышиХ = Mathf.Clamp(вводМыши.x, -50f, 50f);
+        float целевойНаклонМыши = -дельтаМышиХ * (уголНаклонаОтМыши * 0.1f);
+
+        наклонОтМышиLerp = Mathf.Lerp(наклонОтМышиLerp, целевойНаклонМыши, Time.deltaTime * плавностьВозвратаНаклона);
+
+        финальныйЦелевойНаклон = наклонСтрейфа + наклонОтМышиLerp;
+        текущийНаклонZ = Mathf.Lerp(текущийНаклонZ, финальныйЦелевойНаклон, Time.deltaTime * скоростьНаклона);
+
+        ссылкаНаКамеру.localRotation = Quaternion.Euler(вращениеХ, 0, текущийНаклонZ);
     }
 }
