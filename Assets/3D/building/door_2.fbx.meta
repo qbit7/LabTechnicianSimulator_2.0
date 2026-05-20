@@ -1,54 +1,9 @@
 fileFormatVersion: 2
-guid: 79486fb6b34a8a64192bfe7b7686a63c
+guid: 9146141214a04274ba42debe812d2676
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Green leather.003
-    second: {fileID: 2100000, guid: 5d4f316c146af614984b7302c6bbb33f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.004
-    second: {fileID: 2100000, guid: 4ef96551946e9214d8b63856f5dc0b50, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.008
-    second: {fileID: 2100000, guid: 3a41c5b076457fe438a65fc94d1f0254, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.009
-    second: {fileID: 2100000, guid: 07b9a21e22c006c4882e2f41398c915a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.010
-    second: {fileID: 2100000, guid: 7b041f261e2e195438077805e282a44e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.011
-    second: {fileID: 2100000, guid: 7da0bf26dd7f9144eb7bb51554d2c424, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: door_02.001
-    second: {fileID: 2100000, guid: cca7257b9dee6934b88da73dda13bf1f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: door_03.002
-    second: {fileID: 2100000, guid: db63443c426e4d14d8c967bcc6d1854f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: door_03.003
-    second: {fileID: 2100000, guid: 74da24afc593e8d4a86809d086d775d4, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
