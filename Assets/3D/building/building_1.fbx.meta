@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e8ad0d652aa7d0e43854c8c03ef7e644
+guid: 55165fe7183b6504cab1a44f6d931208
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -27,8 +27,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Lightly soiled black metal
-    second: {fileID: 2100000, guid: 9e504e0c06ac4154884a6dde2315551e, type: 2}
+      name: Lightly soiled black metal.001
+    second: {fileID: 2100000, guid: 2a68e87180bafa04781cac7ec9873219, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Lightly soiled black metal.002
+    second: {fileID: 2100000, guid: f7b97b45b649c9448a8f9794e6e1e190, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
